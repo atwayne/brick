@@ -69,6 +69,7 @@
         color: 'grey',
         width: 100,
         height: 10,
+        speedRatio: 0.35,
         bindMouse: function() {
             var self = this;
             canvas.addEventListener(
@@ -335,7 +336,7 @@
                 var safeDistance = paddle.width / 2 + ball.radius;
                 if (Math.abs(distance) <= safeDistance) {
                     ball.speed.Y *= -1;
-                    ball.speed.X = distance * 0.35;
+                    ball.speed.X += distance * paddle.speedRatio;
                     nextY = background.edge.bottom - paddle.height;
                 } else {
                     // fail to catch the ball
