@@ -38,6 +38,30 @@
         }
     };
 
+    var bricks = {
+        color: 'blue',
+        countOfRow: 6,
+        bricksPerRow: 10,
+        gapBetweenBricks: 3,
+        height: 20,
+        reset: function() {
+            var self = this;
+
+            self.width = self.widthPerBrick = background.width / self.bricksPerRow;
+            self.status = [];
+            for (var i = 0; i < self.countOfRow; i++) {
+                var row = [];
+                for (var j = 0; j < self.bricksPerRow; j++) {
+                    var brick = {
+                        destroyed: false
+                    };
+                    row.push(brick);
+                }
+                self.status.push(row);
+            }
+        }
+    };
+
     var paddle = {
         color: 'grey',
         width: 100,
@@ -115,10 +139,15 @@
         ball.reset();
     };
 
+    var setupBricks = function() {
+        bricks.reset();
+    };
+
     var setup = function() {
         setupBorders();
         setupPaddle();
         setupBall();
+        setupBricks();
     };
 
     var initialize = function() {
@@ -135,14 +164,14 @@
         drawBackground();
         drawBall();
         drawPaddle();
+        drawBricks();
         drawMouseTooltip();
+
     };
 
     var drawBackground = function() {
-        var previousStyle = context.fillStyle;
         context.fillStyle = background.color;
         context.fillRect(0, 0, background.width, background.height);
-        context.fillStyle = previousStyle;
     };
 
     var drawBall = function() {
@@ -167,6 +196,47 @@
     var drawPaddle = function() {
         context.fillStyle = paddle.color;
         context.fillRect(paddle.position.X, paddle.position.Y, paddle.width, paddle.height);
+    };
+
+    var getBrickPosition = function(row, column) {
+        var left = 0;
+        var right = left + bricks.width;
+        var top = 0;
+        var bottom = top + bricks.height;
+
+        if (column > 0) {
+            left += column * bricks.widthPerBrick;
+            right = left + bricks.width;
+        }
+
+        if (row > 0) {
+            top = row * bricks.height;
+            bottom = top + bricks.height;
+        }
+
+        return {
+            left: left,
+            right: right,
+            top: top,
+            bottom: bottom
+        };
+    };
+
+    var drawBricks = function() {
+        var brickStatus = bricks.status;
+        for (var i = 0; i < bricks.countOfRow; i++) {
+            for (var j = 0; j < bricks.bricksPerRow; j++) {
+                var brick = brickStatus[i][j];
+                if (brick.destroyed) {
+                    continue;
+                }
+
+                var position = getBrickPosition(i, j);
+                var halfGap = bricks.gapBetweenBricks / 2;
+                context.fillStyle = bricks.color;
+                context.fillRect(position.left + halfGap, position.top + halfGap, bricks.width - halfGap, bricks.height - halfGap);
+            }
+        }
     };
 
     var motion = function() {
