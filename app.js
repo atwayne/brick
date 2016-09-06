@@ -47,6 +47,17 @@
             canvas.addEventListener(
                 'mousemove',
                 function(event) {
+                    var toleranceY = self.height * 10;
+                    var toleranceX = self.width / 2;
+                    var top = background.height - self.height - toleranceY;
+                    var left = self.position.X - toleranceX;
+                    var right = self.position.X + self.width + toleranceX;
+
+                    if (event.clientY < top || event.clientX < left || event.clientX > right) {
+                        // ignore because mouse is not around the paddle
+                        return;
+                    }
+
                     var halfWidth = self.width / 2;
                     var nextX = event.clientX - halfWidth;
 
