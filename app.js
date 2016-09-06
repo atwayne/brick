@@ -33,6 +33,32 @@
         }
     };
 
+    var paddle = {
+        color: 'grey',
+        width: 100,
+        height: 10,
+        bindMouse: function() {
+            var self = this;
+            canvas.addEventListener(
+                'mousemove',
+                function(event) {
+                    var halfWidth = self.width / 2;
+                    var nextX = event.clientX - halfWidth;
+
+                    if (nextX < 0) {
+                        nextX = 0;
+                    }
+
+                    if (nextX > background.width - self.width) {
+                        nextX = background.width - self.width;
+                    }
+
+                    self.position.X = nextX;
+                }
+            );
+        }
+    };
+
     var debug = {
         enabled: true,
         logMouseCoords: function() {
@@ -56,8 +82,18 @@
         };
     };
 
+    var setupPaddle = function() {
+        paddle.position = {
+            X: 0,
+            Y: background.height - paddle.height
+        };
+
+        paddle.bindMouse();
+    };
+
     var setup = function() {
         setupBorders();
+        setupPaddle();
     };
 
     var initialize = function() {
@@ -73,6 +109,7 @@
 
         drawBackground();
         drawBall();
+        drawPaddle();
         drawMouseTooltip();
     };
 
@@ -100,6 +137,11 @@
         context.fillStyle = mouse.color;
         var text = mouse.position.X + "," + mouse.position.Y;
         context.fillText(text, mouse.position.X, mouse.position.Y);
+    };
+
+    var drawPaddle = function() {
+        context.fillStyle = paddle.color;
+        context.fillRect(paddle.position.X, paddle.position.Y, paddle.width, paddle.height);
     };
 
     var motion = function() {
