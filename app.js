@@ -48,12 +48,15 @@
             var self = this;
 
             self.width = self.widthPerBrick = background.width / self.bricksPerRow;
+            self.edge = {}; // overall edge of all undestroyed bricks
             self.status = [];
             for (var i = 0; i < self.countOfRow; i++) {
                 var row = [];
                 for (var j = 0; j < self.bricksPerRow; j++) {
                     var brick = {
-                        destroyed: false
+                        destroyed: false,
+                        // we will use this later
+                        hitStaus: {}
                     };
                     row.push(brick);
                 }
@@ -239,6 +242,77 @@
         }
     };
 
+    var hitCheck = function() {
+        var hit = false;
+        for (var i = 0; i < bricks.countOfRow && !hit; i++) {
+            for (var j = 0; j < bricks.bricksPerRow && !hit; j++) {
+                var brick = bricks.status[i][j];
+                if (brick.destroyed) {
+                    // ignore destroyed bricks
+                    continue;
+                }
+                var position = getBrickPosition(i, j);
+                var bounceX, bounceY;
+
+                if (ball.position.Y - ball.radius > position.bottom) {
+                    // below the brick
+                    brick.hitStaus.bottom = true;
+                    continue;
+                } else {
+                    if (brick.hitStaus.bottom) {
+                        bounceY = true;
+                    }
+                    brick.hitStaus.bottom = false;
+                }
+
+                if (ball.position.Y + ball.radius < position.top) {
+                    // above the brick
+                    brick.hitStaus.up = true;
+                    continue;
+                } else {
+                    if (brick.hitStaus.up) {
+                        bounceY = true;
+                    }
+                    brick.hitStaus.up = false;
+                }
+
+                if (ball.position.X + ball.radius < position.left) {
+                    // left of the brick
+                    brick.hitStaus.left = true;
+                    continue;
+                } else {
+                    if (brick.hitStaus.left) {
+                        bounceX = true;
+                    }
+                    brick.hitStaus.left = false;
+                }
+
+                if (ball.position.X - ball.radius > position.right) {
+                    // right of the brick
+                    brick.hitStaus.right = true;
+                    continue;
+                } else {
+                    if (brick.hitStaus.right) {
+                        bounceX = true;
+                    }
+                    brick.hitStaus.right = false;
+                }
+
+                // it's a hit, destroy the brick first
+                brick.destroyed = true;
+                hit = true;
+
+                if (bounceX) {
+                    ball.speed.X *= -1;
+                }
+
+                if (bounceY) {
+                    ball.speed.Y *= -1;
+                }
+            }
+        }
+    };
+
     var motion = function() {
         var ballMove = function() {
             var nextX = ball.position.X + ball.speed.X;
@@ -280,6 +354,8 @@
         };
 
         ballMove();
+
+        hitCheck();
     };
 
     var app = {
