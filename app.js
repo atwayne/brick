@@ -23,13 +23,18 @@
     var ball = {
         color: 'white',
         radius: 10,
-        speed: {
-            X: 5,
-            Y: 5
-        },
-        position: {
-            X: 5,
-            Y: 5
+        reset: function() {
+            var self = this;
+            // start point
+            self.position = {
+                X: background.width / 2,
+                Y: background.height / 2
+            };
+            // default speed
+            self.speed = {
+                X: 0,
+                Y: 5
+            };
         }
     };
 
@@ -91,9 +96,14 @@
         paddle.bindMouse();
     };
 
+    var setupBall = function() {
+        ball.reset();
+    };
+
     var setup = function() {
         setupBorders();
         setupPaddle();
+        setupBall();
     };
 
     var initialize = function() {
@@ -153,14 +163,26 @@
                 nextX = background.edge.right;
                 ball.speed.X *= -1;
             }
+
             if (nextX < background.edge.left) {
                 nextX = background.edge.left;
                 ball.speed.X *= -1;
             }
 
             if (nextY > background.edge.bottom) {
-                nextY = background.edge.bottom;
-                ball.speed.Y *= -1;
+                var middleXOfPaddle = paddle.position.X + paddle.width / 2;
+                var middleXOfBall = ball.position.X;
+                var distance = middleXOfBall - middleXOfPaddle;
+                var safeDistance = paddle.width / 2 + ball.radius;
+                if (Math.abs(distance) <= safeDistance) {
+                    ball.speed.Y *= -1;
+                    ball.speed.X = distance * 0.35;
+                    nextY = background.edge.bottom - paddle.height;
+                } else {
+                    // fail to catch the ball
+                    ball.reset();
+                    return false;
+                }
             }
             if (nextY < background.edge.top) {
                 nextY = background.edge.top;
