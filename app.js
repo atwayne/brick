@@ -48,7 +48,7 @@
                 'mousemove',
                 function(event) {
                     var toleranceY = self.height * 10;
-                    var toleranceX = self.width / 2;
+                    var toleranceX = self.width * 2;
                     var top = background.height - self.height - toleranceY;
                     var left = self.position.X - toleranceX;
                     var right = self.position.X + self.width + toleranceX;
