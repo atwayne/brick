@@ -61,6 +61,13 @@
                     self.position.X = nextX;
                 }
             );
+        },
+        reset: function() {
+            var self = this;
+            self.position = {
+                X: background.width / 2 - self.width / 2,
+                Y: background.height - self.height
+            };
         }
     };
 
@@ -88,11 +95,8 @@
     };
 
     var setupPaddle = function() {
-        paddle.position = {
-            X: 0,
-            Y: background.height - paddle.height
-        };
 
+        paddle.reset();
         paddle.bindMouse();
     };
 
@@ -180,6 +184,7 @@
                     nextY = background.edge.bottom - paddle.height;
                 } else {
                     // fail to catch the ball
+                    paddle.reset();
                     ball.reset();
                     return false;
                 }
