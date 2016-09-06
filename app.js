@@ -30,9 +30,6 @@
         position: {
             X: 5,
             Y: 5
-        },
-        start: function() {
-            var self = this;
         }
     };
 
@@ -50,14 +47,30 @@
         }
     };
 
+    var setupBorders = function() {
+        background.edge = {
+            left: ball.radius,
+            right: background.width - ball.radius,
+            top: ball.radius,
+            bottom: background.height - ball.radius
+        };
+    };
+
+    var setup = function() {
+        setupBorders();
+    };
+
     var initialize = function() {
         debug.logMouseCoords();
+        setup();
 
         var interval = 1000 / framesPerSecond;
         setInterval(refreshUI, interval);
     };
 
     var refreshUI = function() {
+        motion();
+
         drawBackground();
         drawBall();
         drawMouseTooltip();
@@ -87,6 +100,36 @@
         context.fillStyle = mouse.color;
         var text = mouse.position.X + "," + mouse.position.Y;
         context.fillText(text, mouse.position.X, mouse.position.Y);
+    };
+
+    var motion = function() {
+        var ballMove = function() {
+            var nextX = ball.position.X + ball.speed.X;
+            var nextY = ball.position.Y + ball.speed.Y;
+
+            if (nextX > background.edge.right) {
+                nextX = background.edge.right;
+                ball.speed.X *= -1;
+            }
+            if (nextX < background.edge.left) {
+                nextX = background.edge.left;
+                ball.speed.X *= -1;
+            }
+
+            if (nextY > background.edge.bottom) {
+                nextY = background.edge.bottom;
+                ball.speed.Y *= -1;
+            }
+            if (nextY < background.edge.top) {
+                nextY = background.edge.top;
+                ball.speed.Y *= -1;
+            }
+
+            ball.position.X = nextX;
+            ball.position.Y = nextY;
+        };
+
+        ballMove();
     };
 
     var app = {
